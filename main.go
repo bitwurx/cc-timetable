@@ -7,7 +7,6 @@ import (
 func main() {
 	InitDatabase()
 	s := jrpc2.NewServer(":8888", "/rpc")
-	// interface goes here
-	NewApiV1(nil, s)
+	NewApiV1(&TimetableModel{}, s)
 	s.Start()
 }

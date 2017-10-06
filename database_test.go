@@ -4,6 +4,7 @@ import (
 	"flag"
 	"os"
 	"testing"
+	"time"
 
 	arango "github.com/arangodb/go-driver"
 	arangohttp "github.com/arangodb/go-driver/http"
@@ -60,4 +61,43 @@ func (m MockModel) FetchAll() ([]interface{}, error) {
 
 func (m MockModel) Save(interface{}) (DocumentMeta, error) {
 	return DocumentMeta{}, nil
+}
+
+func TestTimetableModelCreate(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test")
+	}
+	model := new(TimetableModel)
+	if err := model.Create(); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTimetableModelSave(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test")
+	}
+	timetable := NewTimetable("this")
+	timetable.Insert(&Task{Id: "123", RunAt: time.Now().String()})
+	model := new(TimetableModel)
+	if _, err := model.Save(timetable); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestTimetableModelFetchAll(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test")
+	}
+	model := new(TimetableModel)
+	if _, err := model.Save(NewTimetable("key1")); err != nil {
+		t.Fatal(err)
+	}
+	timetables, err := model.FetchAll()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if timetables[0].(*Timetable).Key != "key1" {
+		t.Fatal("expected timetable key to be 'key1'")
+	}
 }
