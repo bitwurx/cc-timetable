@@ -24,10 +24,13 @@ type ApiV1 struct {
 	timetables map[string]*Timetable
 }
 
+// DelayParams contains the rpc parameters for the Delay method.
 type DelayParams struct {
+	// Key is the timetable key.
 	Key *string `json:"key"`
 }
 
+// FromPositional parses the key from the positional parameters.
 func (params *DelayParams) FromPositional(args []interface{}) error {
 	if len(args) != 1 {
 		return errors.New("key parameter is required")
@@ -38,6 +41,7 @@ func (params *DelayParams) FromPositional(args []interface{}) error {
 	return nil
 }
 
+// Delay returns the time until the next scheduled point in time execution.
 func (api *ApiV1) Delay(params json.RawMessage) (interface{}, *jrpc2.ErrorObject) {
 	p := new(DelayParams)
 	if err := jrpc2.ParseParams(params, p); err != nil {
@@ -118,12 +122,17 @@ func (api *ApiV1) GetAll(params json.RawMessage) (interface{}, *jrpc2.ErrorObjec
 	return timetables, nil
 }
 
+// InsertParams contains the rpc parameters for Insert method.
 type InsertParams struct {
+	// Key is the timetable key.
+	// Id is the id of the task.
+	// RunAt in the execution point of time of the task
 	Key   *string `json:"key"`
 	Id    *string `json:"id"`
 	RunAt *string `json:"runAt"`
 }
 
+// FromPositional parse the key, id, and runAt from the positional parameters.
 func (params *InsertParams) FromPositional(args []interface{}) error {
 	if len(args) != 3 {
 		return errors.New("key, id, and runAt parameters are required")
@@ -138,6 +147,7 @@ func (params *InsertParams) FromPositional(args []interface{}) error {
 	return nil
 }
 
+// Insert adds the task to the timetable schedule.
 func (api *ApiV1) Insert(params json.RawMessage) (interface{}, *jrpc2.ErrorObject) {
 	p := new(InsertParams)
 	if err := jrpc2.ParseParams(params, p); err != nil {
