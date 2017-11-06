@@ -201,14 +201,6 @@ func (api *ApiV1) Insert(params json.RawMessage) (interface{}, *jrpc2.ErrorObjec
 	return 0, nil
 }
 
-// RemoveParams contains the rpc parameters for the Remove method.
-type RemoveParams struct {
-	// Key is queue id.
-	// RunAt is the execution point in time of the task.
-	Key   *string `json:"key"`
-	RunAt *string `json:"runAt"`
-}
-
 // NextParams contains the rpc parameters for the Next method.
 type NextParams struct {
 	Key *string `json:"key"`
@@ -246,6 +238,14 @@ func (api *ApiV1) Next(params json.RawMessage) (interface{}, *jrpc2.ErrorObject)
 		}
 	}
 	return timetable.Next(), nil
+}
+
+// RemoveParams contains the rpc parameters for the Remove method.
+type RemoveParams struct {
+	// Key is queue id.
+	// RunAt is the execution point in time of the task.
+	Key   *string `json:"key"`
+	RunAt *string `json:"runAt"`
 }
 
 // FromPositional parses the key and runAt from the positional
