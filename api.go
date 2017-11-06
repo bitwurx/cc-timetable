@@ -201,12 +201,51 @@ func (api *ApiV1) Insert(params json.RawMessage) (interface{}, *jrpc2.ErrorObjec
 	return 0, nil
 }
 
-// RemoveParams contains the rpc parameters for the Remove method
+// RemoveParams contains the rpc parameters for the Remove method.
 type RemoveParams struct {
 	// Key is queue id.
 	// RunAt is the execution point in time of the task.
 	Key   *string `json:"key"`
 	RunAt *string `json:"runAt"`
+}
+
+// NextParams contains the rpc parameters for the Next method.
+type NextParams struct {
+	Key *string `json:"key"`
+}
+
+// FromPositional parse the key positional parameter.
+func (params *NextParams) FromPositional(args []interface{}) error {
+	if len(args) != 1 {
+		return errors.New("key is required")
+	}
+	key := args[0].(string)
+	params.Key = &key
+
+	return nil
+}
+
+// Next returns the next scheduled task from the timetable.
+func (api *ApiV1) Next(params json.RawMessage) (interface{}, *jrpc2.ErrorObject) {
+	p := new(InsertParams)
+	if err := jrpc2.ParseParams(params, p); err != nil {
+		return nil, err
+	}
+	if p.Key == nil {
+		return nil, &jrpc2.ErrorObject{
+			Code:    jrpc2.InvalidParamsCode,
+			Message: jrpc2.InvalidParamsMsg,
+			Data:    "task key is required",
+		}
+	}
+	timetable, ok := api.timetables[*p.Key]
+	if !ok {
+		return nil, &jrpc2.ErrorObject{
+			Code:    TimetableNotFoundCode,
+			Message: TimetableNotFoundMsg,
+		}
+	}
+	return timetable.Next(), nil
 }
 
 // FromPositional parses the key and runAt from the positional
@@ -282,6 +321,7 @@ func NewApiV1(model Model, s *jrpc2.Server) *ApiV1 {
 	s.Register("get", jrpc2.Method{Method: api.Get})
 	s.Register("getAll", jrpc2.Method{Method: api.GetAll})
 	s.Register("insert", jrpc2.Method{Method: api.Insert})
+	s.Register("next", jrpc2.Method{Method: api.Next})
 	s.Register("remove", jrpc2.Method{Method: api.Remove})
 
 	return api

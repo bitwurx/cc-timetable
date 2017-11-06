@@ -80,6 +80,25 @@ func TestTimetableList(t *testing.T) {
 	}
 }
 
+func TestTimetableNext(t *testing.T) {
+	now := time.Now()
+	tasks := []*Task{
+		&Task{RunAt: now.Add(time.Minute * 3).Format(time.RFC3339)},
+		&Task{RunAt: now.Format(time.RFC3339)},
+		&Task{RunAt: now.Add(time.Minute * 5).Format(time.RFC3339)},
+	}
+	timetable := NewTimetable("test")
+	for _, task := range tasks {
+		if err := timetable.Insert(task); err != nil {
+			t.Fatal(err)
+		}
+	}
+	task := timetable.Next()
+	if task.RunAt != tasks[1].RunAt {
+		t.Fatal("got unexpected next task")
+	}
+}
+
 func TestTimetableSave(t *testing.T) {
 	var model Model
 	if testing.Short() {
