@@ -32,7 +32,7 @@ func (table *Timetable) Delay() (int, error) {
 	}
 
 	tasks := make([]string, 0)
-	for runAt, _ := range table.schedule {
+	for runAt := range table.schedule {
 		tasks = append(tasks, runAt)
 	}
 	sort.Strings(tasks)
@@ -69,6 +69,9 @@ func (table *Timetable) List() []*Task {
 
 // Next returns the next task in the schedule
 func (table *Timetable) Next() *Task {
+	if len(table.schedule) < 1 {
+		return nil
+	}
 	var next *time.Time
 	for k := range table.schedule {
 		t, _ := time.Parse(time.RFC3339, k)

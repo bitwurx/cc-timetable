@@ -83,11 +83,14 @@ func TestTimetableList(t *testing.T) {
 func TestTimetableNext(t *testing.T) {
 	now := time.Now()
 	tasks := []*Task{
-		&Task{RunAt: now.Add(time.Minute * 3).Format(time.RFC3339)},
-		&Task{RunAt: now.Format(time.RFC3339)},
-		&Task{RunAt: now.Add(time.Minute * 5).Format(time.RFC3339)},
+		{RunAt: now.Add(time.Minute * 3).Format(time.RFC3339)},
+		{RunAt: now.Format(time.RFC3339)},
+		{RunAt: now.Add(time.Minute * 5).Format(time.RFC3339)},
 	}
 	timetable := NewTimetable("test")
+	if task := timetable.Next(); task != nil {
+		t.Fatal("expected task to be nil")
+	}
 	for _, task := range tasks {
 		if err := timetable.Insert(task); err != nil {
 			t.Fatal(err)
