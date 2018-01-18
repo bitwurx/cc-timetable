@@ -97,6 +97,27 @@ func TestApiV1Insert(t *testing.T) {
 	}
 }
 
+func TestApiV1Next(t *testing.T) {
+	api := NewApiV1(&MockModel{}, jrpc2.NewServer("", ""))
+	now := time.Now()
+	_, errObj := api.Insert([]byte(fmt.Sprintf(`{"key": "k3", "id": "abc123", "runAt": "%s"}`, now.Format(time.RFC3339))))
+	if errObj != nil {
+		t.Fatal(errObj.Message)
+	}
+	_, errObj = api.Insert([]byte(fmt.Sprintf(`{"key": "k3", "id": "abc123", "runAt": "%s"}`, now.Add(time.Minute*5).Format(time.RFC3339))))
+	if errObj != nil {
+		t.Fatal(errObj.Message)
+	}
+	result, err := api.Next([]byte(fmt.Sprintf(`{"key": "k3"}`)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	task := result.(*Task)
+	if task.RunAt == now.String() {
+		t.Fatal("expected run at time to be %s, got %s", task.RunAt, now.String())
+	}
+}
+
 func TestApiV1Remove(t *testing.T) {
 	api := NewApiV1(&MockModel{}, jrpc2.NewServer("", ""))
 	runAt := time.Now().String()

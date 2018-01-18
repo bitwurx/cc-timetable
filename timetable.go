@@ -67,6 +67,22 @@ func (table *Timetable) List() []*Task {
 	return tasks
 }
 
+// Next returns the next task in the schedule
+func (table *Timetable) Next() *Task {
+	var next *time.Time
+	for k := range table.schedule {
+		t, _ := time.Parse(time.RFC3339, k)
+		if next == nil {
+			next = &t
+			continue
+		}
+		if t.Before(*next) {
+			next = &t
+		}
+	}
+	return table.schedule[next.Format(time.RFC3339)]
+}
+
 // Remove deletes the task with the matching run at time from
 // the timetable.
 func (table *Timetable) Remove(runAt string) error {

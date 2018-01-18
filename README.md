@@ -57,7 +57,18 @@ id - (*String*) the id of the task.
 runAt - (*String*) the execution point in time of the task.
 
 #### Returns:
-(*Number*) 0 on success or -1 on failure 
+(*Number*) 0 on success or -1 on failure
+
+---
+#### next(key) : get the next scheduled task in the timetable
+---
+
+#### Parameters:
+
+key - (*String*) the time table key.
+
+#### Returns:
+(*Object*) the next scheduled task
 
 ---
 #### remove(key, runAt) - remove a task from a timetable
@@ -71,3 +82,4 @@ runAt - (*String*) the execution point in time of the task.
 
 #### Returns:
 (*Number*) 0 on success or -1 on failure
+
