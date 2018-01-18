@@ -295,7 +295,6 @@ func (api *ApiV1) Remove(params json.RawMessage) (interface{}, *jrpc2.ErrorObjec
 		return -1, nil
 	}
 	if _, err := timetable.Save(api.model); err != nil {
-		log.Println(err)
 		return -1, &jrpc2.ErrorObject{
 			Code:    -32099,
 			Message: jrpc2.ServerErrorMsg,
