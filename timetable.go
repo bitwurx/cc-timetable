@@ -73,6 +73,7 @@ func (table *Timetable) Next() *Task {
 		return nil
 	}
 	var next *time.Time
+	var task *Task
 	for k := range table.schedule {
 		t, _ := time.Parse(time.RFC3339, k)
 		if next == nil {
@@ -83,7 +84,11 @@ func (table *Timetable) Next() *Task {
 			next = &t
 		}
 	}
-	return table.schedule[next.Format(time.RFC3339)]
+	if time.Now().After(*next) {
+		task = table.schedule[next.Format(time.RFC3339)]
+		delete(table.schedule, next.Format(time.RFC3339))
+	}
+	return task
 }
 
 // Remove deletes the task with the matching run at time from
