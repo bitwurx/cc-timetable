@@ -93,12 +93,14 @@ func (table *Timetable) Next() *Task {
 
 // Remove deletes the task with the matching run at time from
 // the timetable.
-func (table *Timetable) Remove(runAt string) error {
-	if _, ok := table.schedule[runAt]; !ok {
-		return errors.New("not found")
+func (table *Timetable) Remove(id string) error {
+	for k, task := range table.schedule {
+		if task.Id == id {
+			delete(table.schedule, k)
+			return nil
+		}
 	}
-	delete(table.schedule, runAt)
-	return nil
+	return errors.New("not found")
 }
 
 // Save writes the timetable to the database.

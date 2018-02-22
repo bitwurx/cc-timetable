@@ -244,20 +244,20 @@ func (api *ApiV1) Next(params json.RawMessage) (interface{}, *jrpc2.ErrorObject)
 type RemoveParams struct {
 	// Key is queue id.
 	// RunAt is the execution point in time of the task.
-	Key   *string `json:"key"`
-	RunAt *string `json:"runAt"`
+	Key *string `json:"key"`
+	Id  *string `json:"id"`
 }
 
-// FromPositional parses the key and runAt from the positional
+// FromPositional parses the key and Id from the positional
 // parameters.
 func (params *RemoveParams) FromPositional(args []interface{}) error {
 	if len(args) != 2 {
-		return errors.New("key, and runAt parameters are required")
+		return errors.New("key, and Id parameters are required")
 	}
 	key := args[0].(string)
-	runAt := args[1].(string)
+	id := args[1].(string)
 	params.Key = &key
-	params.RunAt = &runAt
+	params.Id = &id
 
 	return nil
 }
@@ -275,11 +275,11 @@ func (api *ApiV1) Remove(params json.RawMessage) (interface{}, *jrpc2.ErrorObjec
 			Data:    "task key is required",
 		}
 	}
-	if p.RunAt == nil {
+	if p.Id == nil {
 		return nil, &jrpc2.ErrorObject{
 			Code:    jrpc2.InvalidParamsCode,
 			Message: jrpc2.InvalidParamsMsg,
-			Data:    "task runAt is required",
+			Data:    "task id is required",
 		}
 	}
 
@@ -291,7 +291,7 @@ func (api *ApiV1) Remove(params json.RawMessage) (interface{}, *jrpc2.ErrorObjec
 		}
 	}
 
-	if err := timetable.Remove(*p.RunAt); err != nil {
+	if err := timetable.Remove(*p.Id); err != nil {
 		return -1, nil
 	}
 	if _, err := timetable.Save(api.model); err != nil {

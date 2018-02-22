@@ -35,14 +35,13 @@ func TestTimetableDelay(t *testing.T) {
 
 func TestTimetableRemove(t *testing.T) {
 	timetable := NewTimetable("test")
-	runAt := time.Now().Format(time.RFC3339)
-	if err := timetable.Remove("test"); err == nil {
-		t.Fatal("expected not found erro")
+	if err := timetable.Remove("abc123"); err == nil {
+		t.Fatal("expected not found error")
 	}
-	if err := timetable.Insert(&Task{RunAt: runAt}); err != nil {
+	if err := timetable.Insert(&Task{Id: "abc123"}); err != nil {
 		t.Fatal(err)
 	}
-	if err := timetable.Remove(runAt); err != nil {
+	if err := timetable.Remove("abc123"); err != nil {
 		t.Fatal(err)
 	}
 	if len(timetable.List()) != 0 {
