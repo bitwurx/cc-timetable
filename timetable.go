@@ -32,7 +32,7 @@ func (table *Timetable) Delay() (int, error) {
 	}
 
 	tasks := make([]string, 0)
-	for runAt, _ := range table.schedule {
+	for runAt := range table.schedule {
 		tasks = append(tasks, runAt)
 	}
 	sort.Strings(tasks)
@@ -69,7 +69,11 @@ func (table *Timetable) List() []*Task {
 
 // Next returns the next task in the schedule
 func (table *Timetable) Next() *Task {
+	if len(table.schedule) < 1 {
+		return nil
+	}
 	var next *time.Time
+	var task *Task
 	for k := range table.schedule {
 		t, _ := time.Parse(time.RFC3339, k)
 		if next == nil {
@@ -80,17 +84,23 @@ func (table *Timetable) Next() *Task {
 			next = &t
 		}
 	}
-	return table.schedule[next.Format(time.RFC3339)]
+	if time.Now().After(*next) {
+		task = table.schedule[next.Format(time.RFC3339)]
+		delete(table.schedule, next.Format(time.RFC3339))
+	}
+	return task
 }
 
 // Remove deletes the task with the matching run at time from
 // the timetable.
-func (table *Timetable) Remove(runAt string) error {
-	if _, ok := table.schedule[runAt]; !ok {
-		return errors.New("not found")
+func (table *Timetable) Remove(id string) error {
+	for k, task := range table.schedule {
+		if task.Id == id {
+			delete(table.schedule, k)
+			return nil
+		}
 	}
-	delete(table.schedule, runAt)
-	return nil
+	return errors.New("not found")
 }
 
 // Save writes the timetable to the database.

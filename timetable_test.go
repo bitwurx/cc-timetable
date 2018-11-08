@@ -35,14 +35,13 @@ func TestTimetableDelay(t *testing.T) {
 
 func TestTimetableRemove(t *testing.T) {
 	timetable := NewTimetable("test")
-	runAt := time.Now().Format(time.RFC3339)
-	if err := timetable.Remove("test"); err == nil {
-		t.Fatal("expected not found erro")
+	if err := timetable.Remove("abc123"); err == nil {
+		t.Fatal("expected not found error")
 	}
-	if err := timetable.Insert(&Task{RunAt: runAt}); err != nil {
+	if err := timetable.Insert(&Task{Id: "abc123"}); err != nil {
 		t.Fatal(err)
 	}
-	if err := timetable.Remove(runAt); err != nil {
+	if err := timetable.Remove("abc123"); err != nil {
 		t.Fatal(err)
 	}
 	if len(timetable.List()) != 0 {
@@ -83,11 +82,14 @@ func TestTimetableList(t *testing.T) {
 func TestTimetableNext(t *testing.T) {
 	now := time.Now()
 	tasks := []*Task{
-		&Task{RunAt: now.Add(time.Minute * 3).Format(time.RFC3339)},
-		&Task{RunAt: now.Format(time.RFC3339)},
-		&Task{RunAt: now.Add(time.Minute * 5).Format(time.RFC3339)},
+		{RunAt: now.Add(time.Minute * 3).Format(time.RFC3339)},
+		{RunAt: now.Format(time.RFC3339)},
+		{RunAt: now.Add(time.Minute * 5).Format(time.RFC3339)},
 	}
 	timetable := NewTimetable("test")
+	if task := timetable.Next(); task != nil {
+		t.Fatal("expected task to be nil")
+	}
 	for _, task := range tasks {
 		if err := timetable.Insert(task); err != nil {
 			t.Fatal(err)

@@ -128,19 +128,19 @@ func TestApiV1Remove(t *testing.T) {
 	if result != 0 {
 		t.Fatal("expected result to be 0")
 	}
-	result, errObj = api.Remove([]byte(`{"key": "test1", "runAt": "9g49g44"}`))
+	result, errObj = api.Remove([]byte(`{"key": "test1", "id": "9g49g44"}`))
 	if errObj != nil {
 		t.Fatal(errObj.Message)
 	}
 	if result != -1 {
 		t.Fatal("expected result to be -1")
 	}
-	result, errObj = api.Remove([]byte(fmt.Sprintf(`{"key": "test1", "runAt": "%s"}`, runAt)))
+	result, errObj = api.Remove([]byte(fmt.Sprintf(`{"key": "test1", "id": "abc321"}`)))
 	if errObj != nil {
 		t.Fatal(errObj.Message)
 	}
 	if result != 0 {
-		t.Fatal("expected result to be -1")
+		t.Fatal("expected result to be 0")
 	}
 	for _, task := range api.timetables["test1"].List() {
 		if task.Id == "abc321" {

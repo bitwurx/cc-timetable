@@ -71,14 +71,14 @@ key - (*String*) the time table key.
 (*Object*) the next scheduled task
 
 ---
-#### remove(key, runAt) - remove a task from a timetable
+#### remove(key, id) - remove a task from a timetable
 ---
 
 #### Parameters:
 
 key - (*String*) the timetable key.
 
-runAt - (*String*) the execution point in time of the task.
+id - (*String*) the id of the task.
 
 #### Returns:
 (*Number*) 0 on success or -1 on failure
