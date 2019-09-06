@@ -106,6 +106,7 @@ func TestTimetableSave(t *testing.T) {
 	if testing.Short() {
 		model = MockModel{}
 	} else {
+		InitDatabase()
 		model = &TimetableModel{}
 	}
 	timetable := NewTimetable("test")

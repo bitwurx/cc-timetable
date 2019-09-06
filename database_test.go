@@ -10,16 +10,22 @@ import (
 	arangohttp "github.com/arangodb/go-driver/http"
 )
 
-func TestMain(m *testing.M) {
+func TestIntegrationAll(t *testing.T) {
+	testMap := map[string]func(t *testing.T){
+		"testTimetableModelCreate":   testTimetableModelCreate,
+		"testTimetableModelSave":     testTimetableModelSave,
+		"testTimetableModelFetchAll": testTimetableModelFetchAll}
 	flag.Parse()
 	if !testing.Short() {
-		InitDatabase()
+		for name, testFunc := range testMap {
+			InitDatabase()
+			t.Run(name, testFunc)
+			tearDownDatabase()
+		}
+
+	} else {
+		t.Skip("Skipping integration tests")
 	}
-	result := m.Run()
-	if !testing.Short() {
-		tearDownDatabase()
-	}
-	os.Exit(result)
 }
 
 func tearDownDatabase() {
@@ -63,20 +69,14 @@ func (m MockModel) Save(interface{}) (DocumentMeta, error) {
 	return DocumentMeta{}, nil
 }
 
-func TestTimetableModelCreate(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+func testTimetableModelCreate(t *testing.T) {
 	model := new(TimetableModel)
 	if err := model.Create(); err != nil {
 		t.Fatal(err)
 	}
 }
 
-func TestTimetableModelSave(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+func testTimetableModelSave(t *testing.T) {
 	timetable := NewTimetable("this")
 	timetable.Insert(&Task{Id: "123", RunAt: time.Now().String()})
 	model := new(TimetableModel)
@@ -85,10 +85,7 @@ func TestTimetableModelSave(t *testing.T) {
 	}
 }
 
-func TestTimetableModelFetchAll(t *testing.T) {
-	if testing.Short() {
-		t.Skip("skipping integration test")
-	}
+func testTimetableModelFetchAll(t *testing.T) {
 	model := new(TimetableModel)
 	if _, err := model.Save(NewTimetable("key1")); err != nil {
 		t.Fatal(err)
@@ -98,6 +95,6 @@ func TestTimetableModelFetchAll(t *testing.T) {
 		t.Fatal(err)
 	}
 	if timetables[0].(*Timetable).Key != "key1" {
-		t.Fatal("expected timetable key to be 'key1'")
+		t.Fatal("expected timetable key to be 'key1' was ", timetables[0].(*Timetable).Key)
 	}
 }
