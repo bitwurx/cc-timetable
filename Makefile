@@ -27,7 +27,7 @@ test:
 		-w /go/src/concord-timetable \
 		--link concord-timetable_test__arangodb:arangodb \
 		--name concord-timetable_test \
-		golang /bin/sh -c "go get -v -t -d && go test -v"
+		golang /bin/sh -c "go get -v -t -d && go test -v -coverprofile=.coverage.out"
 	@docker logs -f concord-timetable_test
 	@docker rm -f concord-timetable_test
 	@docker rm -f concord-timetable_test__arangodb
